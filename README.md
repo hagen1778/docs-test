@@ -1,35 +1,11 @@
-# starter-slim
+# [WIP] VictoriaMetrics docs
 
-1. [Generate with the same files and folders](https://github.com/rundocs/starter-slim/generate) from this repository
-2. Set up your GitHub Pages to source(`/`)
-3. Now you can view your documentation in your site
+This documentation is automatically generated from main repo 
+[VictoriaMetrics](https://github.com/VictoriaMetrics/VictoriaMetrics).
 
-## site.pages
 
-<!-- prettier-ignore-start -->
+## Contributing
 
-| source          | link                                                           |
-| --------------- | -------------------------------------------------------------- |
-{% for page in site.pages -%}
-| {{ page.path }} | [{{ page.url | relative_url }}]({{ page.url | relative_url }}) |
-{% endfor %}
-
-<!-- prettier-ignore-end -->
-
-## Documents
-
-https://jekyll-rtd-theme.rundocs.io
-
-## Local debug
-
-```sh
-gem install jekyll bundler
-
-bundle install
-
-JEKYLL_GITHUB_TOKEN=blank PAGES_API_URL=http://0.0.0.0 bundle exec jekyll server --livereload
-```
-
-## The license
-
-The theme is available as open source under the terms of the MIT License
+If you want to update documentation please feel free 
+to open [an issue](https://github.com/VictoriaMetrics/docs/issues)
+or send a PR to [VictoriaMetrics](https://github.com/VictoriaMetrics/VictoriaMetrics).

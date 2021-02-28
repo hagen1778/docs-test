@@ -5,8 +5,7 @@
 
 // Logo
 .fa-home{
-  position: absolute;
-  margin: 4px 0 0 -20px;
+  vertical-align: middle;
   width: 14px;
 }
 
@@ -21,6 +20,10 @@
 
 .toctree .caption {
   color: #fc5d20 !important;
+}
+
+.toctree .fa {
+  margin-right: 5px;
 }
 
 // Footer
