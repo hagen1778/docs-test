@@ -1,4 +1,4 @@
-# [WIP] VictoriaMetrics docs
+# [WIP]  VictoriaMetrics docs
 
 This documentation is automatically generated from main repo 
 [VictoriaMetrics](https://github.com/VictoriaMetrics/VictoriaMetrics).
