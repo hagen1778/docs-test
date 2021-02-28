@@ -1,15 +1,7 @@
-title: Your awesome title
+title: VictoriaMetrics docs
 lang: en
-description: Write an awesome description for your new site here
+#description:
 
-## local method ##
-# theme: jekyll-rtd-theme
-# debug:
-#   compress: false
-#   dist: true
-#   shortcodes: true
-
-## remote method ##
 remote_theme: rundocs/jekyll-rtd-theme
 
 readme_index:
@@ -18,8 +10,7 @@ readme_index:
 exclude:
   - Gemfile
   - Gemfile.lock
+  - Makefile
 
 plugins:
-  - jemoji
-  - jekyll-avatar
-  - jekyll-mentions
+  - github-pages
