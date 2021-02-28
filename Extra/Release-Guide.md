@@ -1,4 +1,4 @@
-Release process guidance
+# Release process guidance
 
 ## Release version and Docker images
 
