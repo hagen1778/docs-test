@@ -3,6 +3,12 @@
   font-family: 'Lato', sans-serif;
 }
 
+@media (min-width: 1280px) {
+  .content-wrap {
+    max-width: none;
+  }
+}
+
 // Logo
 .fa-home{
   vertical-align: middle;
@@ -10,7 +16,7 @@
 }
 
 .fa-home:before {
-  content: url(/docs-test/assets/images/vm_logo.svg);
+  content: url(/assets/images/vm_logo.svg);
 }
 
 // Navigation

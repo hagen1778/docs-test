@@ -1,6 +1,176 @@
----
-title: Docs
----
+[![Latest Release](https://img.shields.io/github/release/VictoriaMetrics/VictoriaMetrics.svg?style=flat-square)](https://github.com/VictoriaMetrics/VictoriaMetrics/releases/latest)
+[![Docker Pulls](https://img.shields.io/docker/pulls/victoriametrics/victoria-metrics.svg?maxAge=604800)](https://hub.docker.com/r/victoriametrics/victoria-metrics)
+[![Slack](https://img.shields.io/badge/join%20slack-%23victoriametrics-brightgreen.svg)](http://slack.victoriametrics.com/)
+[![GitHub license](https://img.shields.io/github/license/VictoriaMetrics/VictoriaMetrics.svg)](https://github.com/VictoriaMetrics/VictoriaMetrics/blob/master/LICENSE)
+[![Go Report](https://goreportcard.com/badge/github.com/VictoriaMetrics/VictoriaMetrics)](https://goreportcard.com/report/github.com/VictoriaMetrics/VictoriaMetrics)
+[![Build Status](https://github.com/VictoriaMetrics/VictoriaMetrics/workflows/main/badge.svg)](https://github.com/VictoriaMetrics/VictoriaMetrics/actions)
+[![codecov](https://codecov.io/gh/VictoriaMetrics/VictoriaMetrics/branch/master/graph/badge.svg)](https://codecov.io/gh/VictoriaMetrics/VictoriaMetrics)
+
+![Victoria Metrics logo](logo.png "Victoria Metrics")
+
+## VictoriaMetrics
+
+VictoriaMetrics is a fast, cost-effective and scalable monitoring solution and time series database.
+
+It is available in [binary releases](https://github.com/VictoriaMetrics/VictoriaMetrics/releases),
+[docker images](https://hub.docker.com/r/victoriametrics/victoria-metrics/), [Snap package](https://snapcraft.io/victoriametrics)
+and in [source code](https://github.com/VictoriaMetrics/VictoriaMetrics). Just download VictoriaMetrics and see [how to start it](#how-to-start-victoriametrics).
+If you use Ubuntu, then just run `snap install victoriametrics` in order to install and run it.
+Then read [Prometheus setup](#prometheus-setup) and [Grafana setup](#grafana-setup) docs.
+
+Cluster version is available [here](https://github.com/VictoriaMetrics/VictoriaMetrics/tree/cluster).
+
+See additional docs at our [Wiki](https://github.com/VictoriaMetrics/VictoriaMetrics/wiki).
+
+[Contact us](mailto:info@victoriametrics.com) if you need paid enterprise support for VictoriaMetrics.
+See [features available for enterprise customers](https://victoriametrics.com/enterprise.html).
+
+
+## Case studies and talks
+
+Alphabetically sorted links to case studies:
+
+* [adidas](https://victoriametrics.github.io/CaseStudies.html#adidas)
+* [Adsterra](https://victoriametrics.github.io/CaseStudies.html#adsterra)
+* [ARNES](https://victoriametrics.github.io/CaseStudies.html#arnes)
+* [Brandwatch](https://victoriametrics.github.io/CaseStudies.html#brandwatch)
+* [CERN](https://victoriametrics.github.io/CaseStudies.html#cern)
+* [COLOPL](https://victoriametrics.github.io/CaseStudies.html#colopl)
+* [Dreamteam](https://victoriametrics.github.io/CaseStudies.html#dreamteam)
+* [Idealo.de](https://victoriametrics.github.io/CaseStudies.html#idealode)
+* [MHI Vestas Offshore Wind](https://victoriametrics.github.io/CaseStudies.html#mhi-vestas-offshore-wind)
+* [Synthesio](https://victoriametrics.github.io/CaseStudies.html#synthesio)
+* [Wedos.com](https://victoriametrics.github.io/CaseStudies.html#wedoscom)
+* [Wix.com](https://victoriametrics.github.io/CaseStudies.html#wixcom)
+* [Zerodha](https://victoriametrics.github.io/CaseStudies.html#zerodha)
+* [zhihu](https://victoriametrics.github.io/CaseStudies.html#zhihu)
+
+
+## Prominent features
+
+* VictoriaMetrics can be used as long-term storage for Prometheus or for [vmagent](https://victoriametrics.github.io/vmagent.html).
+  See [these docs](#prometheus-setup) for details.
+* VictoriaMetrics supports [Prometheus querying API](https://prometheus.io/docs/prometheus/latest/querying/api/), so it can be used as Prometheus drop-in replacement in Grafana.
+* VictoriaMetrics implements [MetricsQL](https://victoriametrics.github.io/MetricsQL.html) query language backwards compatible with PromQL.
+* VictoriaMetrics provides global query view. Multiple Prometheus instances or any other data sources may ingest data into VictoriaMetrics.
+  Later this data may be queried via a single query.
+* High performance and good scalability for both [inserts](https://medium.com/@valyala/high-cardinality-tsdb-benchmarks-victoriametrics-vs-timescaledb-vs-influxdb-13e6ee64dd6b)
+  and [selects](https://medium.com/@valyala/when-size-matters-benchmarking-victoriametrics-vs-timescale-and-influxdb-6035811952d4).
+  [Outperforms InfluxDB and TimescaleDB by up to 20x](https://medium.com/@valyala/measuring-vertical-scalability-for-time-series-databases-in-google-cloud-92550d78d8ae).
+* [Uses 10x less RAM than InfluxDB](https://medium.com/@valyala/insert-benchmarks-with-inch-influxdb-vs-victoriametrics-e31a41ae2893)
+  and [up to 7x less RAM than Prometheus, Thanos or Cortex](https://valyala.medium.com/prometheus-vs-victoriametrics-benchmark-on-node-exporter-metrics-4ca29c75590f)
+  when dealing with millions of unique time series (aka high cardinality).
+* Optimized for time series with high churn rate. Think about [prometheus-operator](https://github.com/coreos/prometheus-operator) metrics from frequent deployments in Kubernetes.
+* High data compression, so [up to 70x more data points](https://medium.com/@valyala/when-size-matters-benchmarking-victoriametrics-vs-timescale-and-influxdb-6035811952d4)
+  may be crammed into limited storage comparing to TimescaleDB
+  and [up to 7x less storage space is required comparing to Prometheus, Thanos or Cortex](https://valyala.medium.com/prometheus-vs-victoriametrics-benchmark-on-node-exporter-metrics-4ca29c75590f).
+* Optimized for storage with high-latency IO and low IOPS (HDD and network storage in AWS, Google Cloud, Microsoft Azure, etc).
+  See [graphs from these benchmarks](https://medium.com/@valyala/high-cardinality-tsdb-benchmarks-victoriametrics-vs-timescaledb-vs-influxdb-13e6ee64dd6b).
+* A single-node VictoriaMetrics may substitute moderately sized clusters built with competing solutions such as Thanos, M3DB, Cortex, InfluxDB or TimescaleDB.
+  See [vertical scalability benchmarks](https://medium.com/@valyala/measuring-vertical-scalability-for-time-series-databases-in-google-cloud-92550d78d8ae),
+  [comparing Thanos to VictoriaMetrics cluster](https://medium.com/@valyala/comparing-thanos-to-victoriametrics-cluster-b193bea1683)
+  and [Remote Write Storage Wars](https://promcon.io/2019-munich/talks/remote-write-storage-wars/) talk
+  from [PromCon 2019](https://promcon.io/2019-munich/talks/remote-write-storage-wars/).
+* Easy operation:
+  * VictoriaMetrics consists of a single [small executable](https://medium.com/@valyala/stripping-dependency-bloat-in-victoriametrics-docker-image-983fb5912b0d) without external dependencies.
+  * All the configuration is done via explicit command-line flags with reasonable defaults.
+  * All the data is stored in a single directory pointed by `-storageDataPath` command-line flag.
+  * Easy and fast backups from [instant snapshots](https://medium.com/@valyala/how-victoriametrics-makes-instant-snapshots-for-multi-terabyte-time-series-data-e1f3fb0e0282)
+  to S3 or GCS with [vmbackup](https://victoriametrics.github.io/vmbackup.html) / [vmrestore](https://victoriametrics.github.io/vmrestore.html).
+  See [this article](https://medium.com/@valyala/speeding-up-backups-for-big-time-series-databases-533c1a927883) for more details.
+* Storage is protected from corruption on unclean shutdown (i.e. OOM, hardware reset or `kill -9`) thanks to [the storage architecture](https://medium.com/@valyala/how-victoriametrics-makes-instant-snapshots-for-multi-terabyte-time-series-data-e1f3fb0e0282).
+* Supports metrics' scraping, ingestion and [backfilling](#backfilling) via the following protocols:
+  * [Metrics from Prometheus exporters](https://github.com/prometheus/docs/blob/master/content/docs/instrumenting/exposition_formats.md#text-based-format)
+  such as [node_exporter](https://github.com/prometheus/node_exporter). See [these docs](#how-to-scrape-prometheus-exporters-such-as-node-exporter) for details.
+  * [Prometheus remote write API](https://prometheus.io/docs/prometheus/latest/configuration/configuration/#remote_write)
+  * [InfluxDB line protocol](#how-to-send-data-from-influxdb-compatible-agents-such-as-telegraf) over HTTP, TCP and UDP.
+  * [Graphite plaintext protocol](#how-to-send-data-from-graphite-compatible-agents-such-as-statsd) with [tags](https://graphite.readthedocs.io/en/latest/tags.html#carbon)
+    if `-graphiteListenAddr` is set.
+  * [OpenTSDB put message](#sending-data-via-telnet-put-protocol) if `-opentsdbListenAddr` is set.
+  * [HTTP OpenTSDB /api/put requests](#sending-opentsdb-data-via-http-apiput-requests) if `-opentsdbHTTPListenAddr` is set.
+  * [JSON line format](#how-to-import-data-in-json-line-format).
+  * [Native binary format](#how-to-import-data-in-native-format).
+  * [Prometheus exposition format](#how-to-import-data-in-prometheus-exposition-format).
+  * [Arbitrary CSV data](#how-to-import-csv-data).
+* Supports metrics' relabeling. See [these docs](#relabeling) for details.
+* Ideally works with big amounts of time series data from Kubernetes, IoT sensors, connected cars, industrial telemetry, financial data and various Enterprise workloads.
+* Has open source [cluster version](https://github.com/VictoriaMetrics/VictoriaMetrics/tree/cluster).
+* See also technical [Articles about VictoriaMetrics](https://victoriametrics.github.io/Articles.html).
+
+
+## Operation
+
+### Table of contents
+
+* [How to start VictoriaMetrics](#how-to-start-victoriametrics)
+  * [Environment variables](#environment-variables)
+  * [Configuration with snap package](#configuration-with-snap-package)
+* [Prometheus setup](#prometheus-setup)
+* [Grafana setup](#grafana-setup)
+* [How to upgrade VictoriaMetrics](#how-to-upgrade-victoriametrics)
+* [How to apply new config to VictoriaMetrics](#how-to-apply-new-config-to-victoriametrics)
+* [How to scrape Prometheus exporters such as node_exporter](#how-to-scrape-prometheus-exporters-such-as-node-exporter)
+* [How to send data from InfluxDB-compatible agents such as Telegraf](#how-to-send-data-from-influxdb-compatible-agents-such-as-telegraf)
+* [How to send data from Graphite-compatible agents such as StatsD](#how-to-send-data-from-graphite-compatible-agents-such-as-statsd)
+* [Querying Graphite data](#querying-graphite-data)
+* [How to send data from OpenTSDB-compatible agents](#how-to-send-data-from-opentsdb-compatible-agents)
+* [Prometheus querying API usage](#prometheus-querying-api-usage)
+  * [Prometheus querying API enhancements](#prometheus-querying-api-enhancements)
+* [Graphite API usage](#graphite-api-usage)
+  * [Graphite Metrics API usage](#graphite-metrics-api-usage)
+  * [Graphite Tags API usage](#graphite-tags-api-usage)
+* [How to build from sources](#how-to-build-from-sources)
+  * [Development build](#development-build)
+  * [Production build](#production-build)
+  * [ARM build](#arm-build)
+  * [Pure Go build (CGO_ENABLED=0)](#pure-go-build-cgo_enabled0)
+  * [Building docker images](#building-docker-images)
+* [Start with docker-compose](#start-with-docker-compose)
+* [Setting up service](#setting-up-service)
+* [How to work with snapshots](#how-to-work-with-snapshots)
+* [How to delete time series](#how-to-delete-time-series)
+* [Forced merge](#forced-merge)
+* [How to export time series](#how-to-export-time-series)
+  * [How to export data in native format](#how-to-export-data-in-native-format)
+  * [How to export data in JSON line format](#how-to-export-data-in-json-line-format)
+  * [How to export CSV data](#how-to-export-csv-data)
+* [How to import time series data](#how-to-import-time-series-data)
+  * [How to import data in native format](#how-to-import-data-in-native-format)
+  * [How to import data in json line format](#how-to-import-data-in-json-line-format)
+  * [How to import CSV data](#how-to-import-csv-data)
+  * [How to import data in Prometheus exposition format](#how-to-import-data-in-prometheus-exposition-format)
+* [Relabeling](#relabeling)
+* [Federation](#federation)
+* [Capacity planning](#capacity-planning)
+* [High availability](#high-availability)
+* [Deduplication](#deduplication)
+* [Retention](#retention)
+* [Multiple retentions](#multiple-retentions)
+* [Downsampling](#downsampling)
+* [Multi-tenancy](#multi-tenancy)
+* [Scalability and cluster version](#scalability-and-cluster-version)
+* [Alerting](#alerting)
+* [Security](#security)
+* [Tuning](#tuning)
+* [Monitoring](#monitoring)
+* [Troubleshooting](#troubleshooting)
+* [Data migration](#data-migration)
+* [Backfilling](#backfilling)
+* [Data updates](#data-updates)
+* [Replication](#replication)
+* [Backups](#backups)
+* [Profiling](#profiling)
+* [Integrations](#integrations)
+* [Third-party contributions](#third-party-contributions)
+* [Contacts](#contacts)
+* [Community and contributions](#community-and-contributions)
+* [Reporting bugs](#reporting-bugs)
+* [Victoria Metrics Logo](#victoria-metrics-logo)
+  * [Logo Usage Guidelines](#logo-usage-guidelines)
+    * [Font used](#font-used)
+    * [Color Palette](#color-palette)
+  * [We kindly ask](#we-kindly-ask)
+
 
 ## How to start VictoriaMetrics
 
@@ -435,7 +605,8 @@ and it is easier to use when migrating from Graphite to VictoriaMetrics.
 ### Graphite Render API usage
 
 [VictoriaMetrics Enterprise](https://victoriametrics.com/enterprise.html) supports [Graphite Render API](https://graphite.readthedocs.io/en/stable/render_api.html) subset
-at `/render` endpoint. This subset is required for [Graphite datasource in Grafana](https://grafana.com/docs/grafana/latest/datasources/graphite/).
+at `/render` endpoint, which is used by [Graphite datasource in Grafana](https://grafana.com/docs/grafana/latest/datasources/graphite/).
+It supports `Storage-Step` http request header, which must be set to a step between data points stored in VictoriaMetrics when configuring Graphite datasource in Grafana.
 
 
 ### Graphite Metrics API usage
@@ -475,7 +646,7 @@ to your needs or when testing bugfixes.
 
 ### Development build
 
-1. [Install Go](https://golang.org/doc/install). The minimum supported version is Go 1.13.
+1. [Install Go](https://golang.org/doc/install). The minimum supported version is Go 1.14.
 2. Run `make victoria-metrics` from the root folder of the repository.
    It builds `victoria-metrics` binary and puts it into the `bin` folder.
 
@@ -491,7 +662,7 @@ ARM build may run on Raspberry Pi or on [energy-efficient ARM servers](https://b
 
 ### Development ARM build
 
-1. [Install Go](https://golang.org/doc/install). The minimum supported version is Go 1.13.
+1. [Install Go](https://golang.org/doc/install). The minimum supported version is Go 1.14.
 2. Run `make victoria-metrics-arm` or `make victoria-metrics-arm64` from the root folder of the repository.
    It builds `victoria-metrics-arm` or `victoria-metrics-arm64` binary respectively and puts it into the `bin` folder.
 
@@ -507,7 +678,7 @@ ARM build may run on Raspberry Pi or on [energy-efficient ARM servers](https://b
 This is an experimental mode, which may result in a lower compression ratio and slower decompression performance.
 Use it with caution!
 
-1. [Install Go](https://golang.org/doc/install). The minimum supported version is Go 1.13.
+1. [Install Go](https://golang.org/doc/install). The minimum supported version is Go 1.14.
 2. Run `make victoria-metrics-pure` from the root folder of the repository.
    It builds `victoria-metrics-pure` binary and puts it into the `bin` folder.
 
@@ -994,8 +1165,8 @@ on the same time series if they fall within the same discrete 60s bucket.  The e
 
 The recommended value for `-dedup.minScrapeInterval` must equal to `scrape_interval` config from Prometheus configs.
 
-The de-duplication reduces disk space usage if multiple identically configured Prometheus instances in HA pair
-write data to the same VictoriaMetrics instance. Note that these Prometheus instances must have identical
+The de-duplication reduces disk space usage if multiple identically configured [vmagent](https://victoriametrics.github.io/vmagent.html) or Prometheus instances in HA pair
+write data to the same VictoriaMetrics instance. These vmagent or Prometheus instances must have identical
 `external_labels` section in their configs, so they write data to the same time series.
 
 
@@ -1146,6 +1317,17 @@ See the example of alerting rules for VM components [here](https://github.com/Vi
 * It is recommended upgrading to the latest available release from [this page](https://github.com/VictoriaMetrics/VictoriaMetrics/releases),
   since the encountered issue could be already fixed there.
 
+* It is recommended to have at least 50% of spare resources for CPU, disk IO and RAM, so VictoriaMetrics could handle short spikes in the workload without performance issues.
+
+* VictoriaMetrics requires free disk space for [merging data files to bigger ones](https://medium.com/@valyala/how-victoriametrics-makes-instant-snapshots-for-multi-terabyte-time-series-data-e1f3fb0e0282).
+  It may slow down when there is no enough free space left. So make sure `-storageDataPath` directory
+  has at least 20% of free space. The remaining amount of free space
+  can be [monitored](#monitoring) via `vm_free_disk_space_bytes` metric. The total size of data
+  stored on the disk can be monitored via sum of `vm_data_size_bytes` metrics.
+  See also `vm_merge_need_free_disk_space` metrics, which are set to values higher than 0
+  if background merge cannot be initiated due to free disk space shortage. The value shows the number of per-month partitions,
+  which would start background merge if they had more free disk space.
+
 * It is recommended inspecting logs during troubleshooting, since they may contain useful information.
 
 * VictoriaMetrics buffers incoming data in memory for up to a few seconds before flushing it to persistent storage.
@@ -1163,15 +1345,6 @@ See the example of alerting rules for VM components [here](https://github.com/Vi
 
 * VictoriaMetrics prioritizes data ingestion over data querying. So if it has no enough resources for data ingestion,
   then data querying may slow down significantly.
-
-* VictoriaMetrics requires free disk space for [merging data files to bigger ones](https://medium.com/@valyala/how-victoriametrics-makes-instant-snapshots-for-multi-terabyte-time-series-data-e1f3fb0e0282).
-  It may slow down when there is no enough free space left. So make sure `-storageDataPath` directory
-  has at least 20% of free space comparing to disk size. The remaining amount of free space
-  can be [monitored](#monitoring) via `vm_free_disk_space_bytes` metric. The total size of data
-  stored on the disk can be monitored via sum of `vm_data_size_bytes` metrics.
-  See also `vm_merge_need_free_disk_space` metrics, which are set to values higher than 0
-  if background merge cannot be initiated due to free disk space shortage. The value shows the number of per-month partitions,
-  which would start background merge if they had more free disk space.
 
 * If VictoriaMetrics doesn't work because of certain parts are corrupted due to disk errors,
   then just remove directories with broken parts. It is safe removing subdirectories under `<-storageDataPath>/data/{big,small}/YYYY_MM` directories

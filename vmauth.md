@@ -1,6 +1,10 @@
----
-title: Docs
----
+## vmauth
+
+`vmauth` is a simple auth proxy and router for [VictoriaMetrics](https://github.com/VictoriaMetrics/VictoriaMetrics).
+It reads username and password from [Basic Auth headers](https://en.wikipedia.org/wiki/Basic_access_authentication),
+matches them against configs pointed by `-auth.config` command-line flag and proxies incoming HTTP requests to the configured per-user `url_prefix` on successful match.
+
+
 ## Quick start
 
 Just download `vmutils-*` archive from [releases page](https://github.com/VictoriaMetrics/VictoriaMetrics/releases), unpack it
@@ -106,7 +110,7 @@ It is recommended using [binary releases](https://github.com/VictoriaMetrics/Vic
 
 ### Development build
 
-1. [Install Go](https://golang.org/doc/install). The minimum supported version is Go 1.13.
+1. [Install Go](https://golang.org/doc/install). The minimum supported version is Go 1.14.
 2. Run `make vmauth` from the root folder of the repository.
    It builds `vmauth` binary and puts it into the `bin` folder.
 
@@ -170,6 +174,8 @@ See the docs at https://victoriametrics.github.io/vmauth.html .
     	Whether to enable reading flags from environment variables additionally to command line. Command line flag values have priority over values from environment vars. Flags are read only from command line if this flag isn't set
   -envflag.prefix string
     	Prefix for environment variables if -envflag.enable is set
+  -fs.disableMmap
+    	Whether to use pread() instead of mmap() for reading data files. By default mmap() is used for 64-bit arches and pread() is used for 32-bit arches, since they cannot read data files bigger than 2^32 bytes in memory. mmap() is usually faster for reading small data chunks than pread()
   -http.connTimeout duration
     	Incoming http connections are closed after the configured timeout. This may help spreading incoming load among a cluster of services behind load balancer. Note that the real timeout may be bigger by up to 10% as a protection from Thundering herd problem (default 2m0s)
   -http.disableResponseCompression
@@ -188,14 +194,20 @@ See the docs at https://victoriametrics.github.io/vmauth.html .
     	Username for HTTP Basic Auth. The authentication is disabled if empty. See also -httpAuth.password
   -httpListenAddr string
     	TCP address to listen for http connections (default ":8427")
+  -loggerDisableTimestamps
+    	Whether to disable writing timestamps in logs
   -loggerErrorsPerSecondLimit int
-    	Per-second limit on the number of ERROR messages. If more than the given number of errors are emitted per second, then the remaining errors are suppressed. Zero value disables the rate limit (default 10)
+    	Per-second limit on the number of ERROR messages. If more than the given number of errors are emitted per second, then the remaining errors are suppressed. Zero value disables the rate limit
   -loggerFormat string
     	Format for logs. Possible values: default, json (default "default")
   -loggerLevel string
     	Minimum level of errors to log. Possible values: INFO, WARN, ERROR, FATAL, PANIC (default "INFO")
   -loggerOutput string
     	Output for the logs. Supported values: stderr, stdout (default "stderr")
+  -loggerTimezone string
+    	Timezone to use for timestamps in logs. Timezone must be a valid IANA Time Zone. For example: America/New_York, Europe/Berlin, Etc/GMT+3 or Local (default "UTC")
+  -loggerWarnsPerSecondLimit int
+    	Per-second limit on the number of WARN messages. If more than the given number of warns are emitted per second, then the remaining warns are suppressed. Zero value disables the rate limit
   -memory.allowedBytes value
     	Allowed size of system memory VictoriaMetrics caches may occupy. This option overrides -memory.allowedPercent if set to non-zero value. Too low value may increase cache miss rate, which usually results in higher CPU and disk IO usage. Too high value may evict too much data from OS page cache, which will result in higher disk IO usage
     	Supports the following optional suffixes for values: KB, MB, GB, KiB, MiB, GiB (default 0)

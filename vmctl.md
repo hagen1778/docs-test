@@ -1,6 +1,40 @@
----
-title: Docs
----
+# vmctl
+
+Victoria metrics command-line tool
+
+Features:
+- [x] Prometheus: migrate data from Prometheus to VictoriaMetrics using snapshot API
+- [x] Thanos: migrate data from Thanos to VictoriaMetrics
+- [ ] ~~Prometheus: migrate data from Prometheus to VictoriaMetrics by query~~(discarded)
+- [x] InfluxDB: migrate data from InfluxDB to VictoriaMetrics
+- [ ] Storage Management: data re-balancing between nodes 
+
+# Table of contents
+
+* [Articles](#articles)
+* [How to build](#how-to-build)
+* [Migrating data from InfluxDB 1.x](#migrating-data-from-influxdb-1x)
+   * [Data mapping](#data-mapping)
+   * [Configuration](#configuration)
+   * [Filtering](#filtering)
+* [Migrating data from InfluxDB 2.x](#migrating-data-from-influxdb-2x)  
+* [Migrating data from Prometheus](#migrating-data-from-prometheus)
+   * [Data mapping](#data-mapping-1)
+   * [Configuration](#configuration-1)
+   * [Filtering](#filtering-1)
+* [Migrating data from Thanos](#migrating-data-from-thanos)
+   * [Current data](#current-data)
+   * [Historical data](#historical-data)
+* [Migrating data from VictoriaMetrics](#migrating-data-from-victoriametrics)
+   * [Native protocol](#native-protocol)
+* [Tuning](#tuning)
+   * [Influx mode](#influx-mode)
+   * [Prometheus mode](#prometheus-mode)
+   * [VictoriaMetrics importer](#victoriametrics-importer)
+   * [Importer stats](#importer-stats)
+* [Significant figures](#significant-figures)
+* [Adding extra labels](#adding-extra-labels)
+
 
 ## Articles
 
@@ -11,9 +45,10 @@ title: Docs
 
 It is recommended using [binary releases](https://github.com/VictoriaMetrics/VictoriaMetrics/releases) - `vmctl` is located in `vmutils-*` archives there.
 
+
 ### Development build
 
-1. [Install Go](https://golang.org/doc/install). The minimum supported version is Go 1.13.
+1. [Install Go](https://golang.org/doc/install). The minimum supported version is Go 1.14.
 2. Run `make vmctl` from the root folder of the repository.
    It builds `vmctl` binary and puts it into the `bin` folder.
 
@@ -42,7 +77,7 @@ ARM build may run on Raspberry Pi or on [energy-efficient ARM servers](https://b
 
 #### Development ARM build
 
-1. [Install Go](https://golang.org/doc/install). The minimum supported version is Go 1.13.
+1. [Install Go](https://golang.org/doc/install). The minimum supported version is Go 1.14.
 2. Run `make vmctl-arm` or `make vmctl-arm64` from the root folder of the repository.
    It builds `vmctl-arm` or `vmctl-arm64` binary respectively and puts it into the `bin` folder.
 

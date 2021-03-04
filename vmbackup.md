@@ -1,6 +1,27 @@
----
-title: Docs
----
+## vmbackup
+
+`vmbackup` creates VictoriaMetrics data backups from [instant snapshots](https://victoriametrics.github.io/Single-server-VictoriaMetrics.html#how-to-work-with-snapshots).
+
+Supported storage systems for backups:
+
+* [GCS](https://cloud.google.com/storage/). Example: `gcs://<bucket>/<path/to/backup>`
+* [S3](https://aws.amazon.com/s3/). Example: `s3://<bucket>/<path/to/backup>`
+* Any S3-compatible storage such as [MinIO](https://github.com/minio/minio), [Ceph](https://docs.ceph.com/docs/mimic/radosgw/s3/) or [Swift](https://www.swiftstack.com/docs/admin/middleware/s3_middleware.html). See [these docs](#advanced-usage) for details.
+* Local filesystem. Example: `fs://</absolute/path/to/backup>`
+
+`vmbackup` supports incremental and full backups. Incremental backups created automatically if the destination path already contains data from the previous backup.
+Full backups can be sped up with `-origin` pointing to already existing backup on the same remote storage. In this case `vmbackup` makes server-side copy for the shared
+data between the existing backup and new backup. It saves time and costs on data transfer.
+
+Backup process can be interrupted at any time. It is automatically resumed from the interruption point when restarting `vmbackup` with the same args.
+
+Backed up data can be restored with [vmrestore](https://victoriametrics.github.io/vmrestore.html).
+
+See [this article](https://medium.com/@valyala/speeding-up-backups-for-big-time-series-databases-533c1a927883) for more details.
+
+See also [vmbackupmanager](https://github.com/VictoriaMetrics/VictoriaMetrics/issues/466) tool built on top of `vmbackup`. This tool simplifies
+creation of hourly, daily, weekly and monthly backups.
+
 
 ## Use cases
 
@@ -170,14 +191,20 @@ See [this article](https://medium.com/@valyala/speeding-up-backups-for-big-time-
     	Prefix for environment variables if -envflag.enable is set
   -fs.disableMmap
     	Whether to use pread() instead of mmap() for reading data files. By default mmap() is used for 64-bit arches and pread() is used for 32-bit arches, since they cannot read data files bigger than 2^32 bytes in memory. mmap() is usually faster for reading small data chunks than pread()
+  -loggerDisableTimestamps
+    	Whether to disable writing timestamps in logs
   -loggerErrorsPerSecondLimit int
-    	Per-second limit on the number of ERROR messages. If more than the given number of errors are emitted per second, then the remaining errors are suppressed. Zero value disables the rate limit (default 10)
+    	Per-second limit on the number of ERROR messages. If more than the given number of errors are emitted per second, then the remaining errors are suppressed. Zero value disables the rate limit
   -loggerFormat string
     	Format for logs. Possible values: default, json (default "default")
   -loggerLevel string
     	Minimum level of errors to log. Possible values: INFO, WARN, ERROR, FATAL, PANIC (default "INFO")
   -loggerOutput string
     	Output for the logs. Supported values: stderr, stdout (default "stderr")
+  -loggerTimezone string
+    	Timezone to use for timestamps in logs. Timezone must be a valid IANA Time Zone. For example: America/New_York, Europe/Berlin, Etc/GMT+3 or Local (default "UTC")
+  -loggerWarnsPerSecondLimit int
+    	Per-second limit on the number of WARN messages. If more than the given number of warns are emitted per second, then the remaining warns are suppressed. Zero value disables the rate limit
   -maxBytesPerSecond value
     	The maximum upload speed. There is no limit if it is set to 0
     	Supports the following optional suffixes for values: KB, MB, GB, KiB, MiB, GiB (default 0)
@@ -208,7 +235,7 @@ It is recommended using [binary releases](https://github.com/VictoriaMetrics/Vic
 
 ### Development build
 
-1. [Install Go](https://golang.org/doc/install). The minimum supported version is Go 1.13.
+1. [Install Go](https://golang.org/doc/install). The minimum supported version is Go 1.14.
 2. Run `make vmbackup` from the root folder of the repository.
    It builds `vmbackup` binary and puts it into the `bin` folder.
 

@@ -1,6 +1,11 @@
----
-title: Docs
----
+## vmrestore
+
+`vmrestore` restores data from backups created by [vmbackup](https://victoriametrics.github.io/vbackup.html).
+VictoriaMetrics `v1.29.0` and newer versions must be used for working with the restored data.
+
+Restore process can be interrupted at any time. It is automatically resumed from the interruption point
+when restarting `vmrestore` with the same args.
+
 
 ## Usage
 
@@ -86,14 +91,20 @@ i.e. the end result would be similar to [rsync --delete](https://askubuntu.com/q
     	Prefix for environment variables if -envflag.enable is set
   -fs.disableMmap
     	Whether to use pread() instead of mmap() for reading data files. By default mmap() is used for 64-bit arches and pread() is used for 32-bit arches, since they cannot read data files bigger than 2^32 bytes in memory. mmap() is usually faster for reading small data chunks than pread()
+  -loggerDisableTimestamps
+    	Whether to disable writing timestamps in logs
   -loggerErrorsPerSecondLimit int
-    	Per-second limit on the number of ERROR messages. If more than the given number of errors are emitted per second, then the remaining errors are suppressed. Zero value disables the rate limit (default 10)
+    	Per-second limit on the number of ERROR messages. If more than the given number of errors are emitted per second, then the remaining errors are suppressed. Zero value disables the rate limit
   -loggerFormat string
     	Format for logs. Possible values: default, json (default "default")
   -loggerLevel string
     	Minimum level of errors to log. Possible values: INFO, WARN, ERROR, FATAL, PANIC (default "INFO")
   -loggerOutput string
     	Output for the logs. Supported values: stderr, stdout (default "stderr")
+  -loggerTimezone string
+    	Timezone to use for timestamps in logs. Timezone must be a valid IANA Time Zone. For example: America/New_York, Europe/Berlin, Etc/GMT+3 or Local (default "UTC")
+  -loggerWarnsPerSecondLimit int
+    	Per-second limit on the number of WARN messages. If more than the given number of warns are emitted per second, then the remaining warns are suppressed. Zero value disables the rate limit
   -maxBytesPerSecond value
     	The maximum download speed. There is no limit if it is set to 0
     	Supports the following optional suffixes for values: KB, MB, GB, KiB, MiB, GiB (default 0)
@@ -120,7 +131,7 @@ It is recommended using [binary releases](https://github.com/VictoriaMetrics/Vic
 
 ### Development build
 
-1. [Install Go](https://golang.org/doc/install). The minimum supported version is Go 1.13.
+1. [Install Go](https://golang.org/doc/install). The minimum supported version is Go 1.14.
 2. Run `make vmrestore` from the root folder of the repository.
    It builds `vmrestore` binary and puts it into the `bin` folder.
 

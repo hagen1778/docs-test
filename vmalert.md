@@ -1,11 +1,33 @@
----
-title: Docs
----
+## vmalert
 
-## QuickStart
+`vmalert` executes a list of given [alerting](https://prometheus.io/docs/prometheus/latest/configuration/alerting_rules/)
+or [recording](https://prometheus.io/docs/prometheus/latest/configuration/recording_rules/)
+rules against configured address.
+
+### Features:
+* Integration with [VictoriaMetrics](https://github.com/VictoriaMetrics/VictoriaMetrics) TSDB;
+* VictoriaMetrics [MetricsQL](https://victoriametrics.github.io/MetricsQL.html)
+ support and expressions validation;
+* Prometheus [alerting rules definition format](https://prometheus.io/docs/prometheus/latest/configuration/alerting_rules/#defining-alerting-rules)
+ support;
+* Integration with [Alertmanager](https://github.com/prometheus/alertmanager);
+* Keeps the alerts [state on restarts](https://github.com/VictoriaMetrics/VictoriaMetrics/tree/master/app/vmalert#alerts-state-on-restarts);
+* Graphite datasource can be used for alerting and recording rules. See [these docs](#graphite) for details.
+* Lightweight without extra dependencies.
+
+### Limitations:
+* `vmalert` execute queries against remote datasource which has reliability risks because of network. 
+It is recommended to configure alerts thresholds and rules expressions with understanding that network request
+may fail;
+* by default, rules execution is sequential within one group, but persisting of execution results to remote
+storage is asynchronous. Hence, user shouldn't rely on recording rules chaining when result of previous
+recording rule is reused in next one;
+* `vmalert` has no UI, just an API for getting groups and rules statuses.
+
+### QuickStart
 
 To build `vmalert` from sources:
-```bash
+```
 git clone https://github.com/VictoriaMetrics/VictoriaMetrics
 cd VictoriaMetrics
 make vmalert
@@ -21,7 +43,7 @@ aggregating alerts and sending notifications.
 compatible storage address for storing recording rules results and alerts state in for of timeseries. This is optional.
 
 Then configure `vmalert` accordingly:
-```bash
+```
 ./bin/vmalert -rule=alert.rules \
     -datasource.url=http://localhost:8428 \  # PromQL compatible datasource
     -notifier.url=http://localhost:9093 \    # AlertManager URL
@@ -46,7 +68,7 @@ groups:
   [ - <rule_group> ]
 ```
 
-### Groups
+#### Groups
 
 Each group has following attributes:
 ```yaml
@@ -68,7 +90,7 @@ rules:
   [ - <rule> ... ]
 ```
 
-### Rules
+#### Rules
 
 There are two types of Rules:
 * [alerting](https://prometheus.io/docs/prometheus/latest/configuration/alerting_rules/) - 
@@ -81,7 +103,7 @@ and save their result as a new set of time series.
 `vmalert` forbids to define duplicates - rules with the same combination of name, expression and labels
 within one group. 
 
-#### Alerting rules
+##### Alerting rules
 
 The syntax for alerting rule is following:
 ```yaml
@@ -110,7 +132,7 @@ annotations:
   [ <labelname>: <tmpl_string> ]
 ``` 
 
-#### Recording rules
+##### Recording rules
 
 The syntax for recording rules is following:
 ```yaml
@@ -134,7 +156,7 @@ labels:
 For recording rules to work `-remoteWrite.url` must specified.
 
 
-### Alerts state on restarts
+#### Alerts state on restarts
 
 `vmalert` has no local storage, so alerts state is stored in the process memory. Hence, after reloading of `vmalert` 
 the process alerts state will be lost. To avoid this situation, `vmalert` should be configured via the following flags:
@@ -150,18 +172,18 @@ in configured `-remoteRead.url`, weren't updated in the last `1h` or received st
 rules configuration.
 
 
-### WEB
+#### WEB
 
 `vmalert` runs a web-server (`-httpListenAddr`) for serving metrics and alerts endpoints:
 * `http://<vmalert-addr>/api/v1/groups` - list of all loaded groups and rules;
 * `http://<vmalert-addr>/api/v1/alerts` - list of all active alerts;
-* `http://<vmalert-addr>/api/v1/<groupName>/<alertID>/status" ` - get alert status by ID.
+* `http://<vmalert-addr>/api/v1/<groupID>/<alertID>/status" ` - get alert status by ID.
 Used as alert source in AlertManager.
 * `http://<vmalert-addr>/metrics` - application metrics.
 * `http://<vmalert-addr>/-/reload` - hot configuration reload.
 
 
-## Graphite
+### Graphite
 
 vmalert sends requests to `<-datasource.url>/render?format=json` during evaluation of alerting and recording rules
 if the corresponding group or rule contains `type: "graphite"` config option. It is expected that the `<-datasource.url>/render`
@@ -170,12 +192,12 @@ When using vmalert with both `graphite` and `prometheus` rules configured agains
 to set `-datasource.appendTypePrefix` flag to `true`, so vmalert can adjust URL prefix automatically based on query type.
 
 
-## Configuration
+### Configuration
 
 The shortlist of configuration flags is the following:
 ```
   -datasource.appendTypePrefix
-        Whether to add type prefix to -datasource.url based on the query type. Set to true if sending different query types to VMSelect URL.
+    	Whether to add type prefix to -datasource.url based on the query type. Set to true if sending different query types to VMSelect URL.
   -datasource.basicAuth.password string
     	Optional basic auth password for -datasource.url
   -datasource.basicAuth.username string
@@ -184,6 +206,8 @@ The shortlist of configuration flags is the following:
     	Lookback defines how far to look into past when evaluating queries. For example, if datasource.lookback=5m then param "time" with value now()-5m will be added to every query.
   -datasource.maxIdleConnections int
     	Defines the number of idle (keep-alive connections) to configured datasource.Consider to set this value equal to the value: groups_total * group.concurrency. Too low value may result into high number of sockets in TIME_WAIT state. (default 100)
+  -datasource.queryStep duration
+    	queryStep defines how far a value can fallback to when evaluating queries. For example, if datasource.queryStep=15s then param "step" with value "15s" will be added to every query.
   -datasource.tlsCAFile string
     	Optional path to TLS CA file to use for verifying connections to -datasource.url. By default system CA is used
   -datasource.tlsCertFile string
@@ -214,6 +238,8 @@ The shortlist of configuration flags is the following:
     	Supports array of values separated by comma or specified via multiple flags.
   -external.url string
     	External URL is used as alert's source for sent alerts to the notifier
+  -fs.disableMmap
+    	Whether to use pread() instead of mmap() for reading data files. By default mmap() is used for 64-bit arches and pread() is used for 32-bit arches, since they cannot read data files bigger than 2^32 bytes in memory. mmap() is usually faster for reading small data chunks than pread()
   -http.connTimeout duration
     	Incoming http connections are closed after the configured timeout. This may help spreading incoming load among a cluster of services behind load balancer. Note that the real timeout may be bigger by up to 10% as a protection from Thundering herd problem (default 2m0s)
   -http.disableResponseCompression
@@ -242,6 +268,8 @@ The shortlist of configuration flags is the following:
     	Minimum level of errors to log. Possible values: INFO, WARN, ERROR, FATAL, PANIC (default "INFO")
   -loggerOutput string
     	Output for the logs. Supported values: stderr, stdout (default "stderr")
+  -loggerTimezone string
+    	Timezone to use for timestamps in logs. Timezone must be a valid IANA Time Zone. For example: America/New_York, Europe/Berlin, Etc/GMT+3 or Local (default "UTC")
   -loggerWarnsPerSecondLimit int
     	Per-second limit on the number of WARN messages. If more than the given number of warns are emitted per second, then the remaining warns are suppressed. Zero value disables the rate limit
   -memory.allowedBytes value
@@ -348,43 +376,43 @@ command-line flags with their descriptions.
 To reload configuration without `vmalert` restart send SIGHUP signal
 or send GET request to `/-/reload` endpoint.
 
-## Contributing
+### Contributing
 
 `vmalert` is mostly designed and built by VictoriaMetrics community.
 Feel free to share your experience and ideas for improving this 
 software. Please keep simplicity as the main priority.
 
-## How to build from sources
+### How to build from sources
 
 It is recommended using 
 [binary releases](https://github.com/VictoriaMetrics/VictoriaMetrics/releases) 
 - `vmalert` is located in `vmutils-*` archives there.
 
 
-### Development build
+#### Development build
 
-1. [Install Go](https://golang.org/doc/install). The minimum supported version is Go 1.13.
+1. [Install Go](https://golang.org/doc/install). The minimum supported version is Go 1.14.
 2. Run `make vmalert` from the root folder of the repository.
    It builds `vmalert` binary and puts it into the `bin` folder.
 
-### Production build
+#### Production build
 
 1. [Install docker](https://docs.docker.com/install/).
 2. Run `make vmalert-prod` from the root folder of the repository.
    It builds `vmalert-prod` binary and puts it into the `bin` folder.
 
 
-### ARM build
+#### ARM build
 
 ARM build may run on Raspberry Pi or on [energy-efficient ARM servers](https://blog.cloudflare.com/arm-takes-wing/).
 
-### Development ARM build
+#### Development ARM build
 
-1. [Install Go](https://golang.org/doc/install). The minimum supported version is Go 1.13.
+1. [Install Go](https://golang.org/doc/install). The minimum supported version is Go 1.14.
 2. Run `make vmalert-arm` or `make vmalert-arm64` from the root folder of the repository.
    It builds `vmalert-arm` or `vmalert-arm64` binary respectively and puts it into the `bin` folder.
 
-### Production ARM build
+#### Production ARM build
 
 1. [Install docker](https://docs.docker.com/install/).
 2. Run `make vmalert-arm-prod` or `make vmalert-arm64-prod` from the root folder of the repository.
