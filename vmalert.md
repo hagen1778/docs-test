@@ -201,8 +201,9 @@ set the path via `-rule.templates` flag.
 
 For example, template `grafana.filter` can be defined as following:
 
-```yaml
 {% raw  %}
+```yaml
+
 {{ define "grafana.filter" -}}
   {{- $labels := .arg0 -}}
   {{- range $name, $label := . -}}
@@ -211,9 +212,8 @@ For example, template `grafana.filter` can be defined as following:
     {{- end -}}
   {{- end -}}
 {{- end -}}
-{% endraw  %}
 ```
-
+{% endraw  %}
 
 And then used in annotations:
 
