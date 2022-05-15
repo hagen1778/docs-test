@@ -199,7 +199,7 @@ Like in Alertmanager you can define [reusable templates](https://prometheus.io/d
 to share same templates across annotations. Just define the templates in a file and 
 set the path via `-rule.templates` flag.
 
-For example, template `grafana.filter` can be defined as following:
+For example, template `grafana.filter` can be defined as following 1:
 
 {% raw  %}
 ```yaml
