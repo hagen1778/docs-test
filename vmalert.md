@@ -216,7 +216,7 @@ For example, template `grafana.filter` can be defined as following 1:
 {% endraw  %}
 
 And then used in annotations:
-
+{% raw  %}
 ```yaml
 groups:
   - name: AlertGroupName
@@ -230,6 +230,7 @@ groups:
         annotations:
           dashboard: '{{ $externalURL }}/d/dashboard?orgId=1{{ template "grafana.filter" (args .CommonLabels "account_id" "any_label") }}'
 ```
+{% endraw  %}
 
 The `-rule.templates` flag supports wildcards so multiple files with templates can be loaded.
 The content of `-rule.templates` can be also [hot reloaded](#hot-config-reload).
