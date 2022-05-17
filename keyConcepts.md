@@ -381,7 +381,7 @@ samples from 1m to 3m. If we plot this data sample on the system of coordinates,
 
 <p style="text-align: center">
     <a href="keyConcepts_data_samples.png" target="_blank">
-        <img src="KeyConcepts_data_samples.png" width="500">
+        <img src="keyConcepts_data_samples.png" width="500">
     </a>
 </p>
 
@@ -401,7 +401,7 @@ requested timestamp, VictoriaMetrics will try to locate the closest sample on th
 
 <p style="text-align: center">
     <a href="keyConcepts_instant_query.png" target="_blank">
-        <img src="KeyConcepts_instant_query.png" width="500">
+        <img src="keyConcepts_instant_query.png" width="500">
     </a>
 </p>
 
@@ -446,7 +446,7 @@ If we plot this request in VictoriaMetrics the graph will be shown as the follow
 
 <p style="text-align: center">
     <a href="keyConcepts_range_query.png" target="_blank">
-        <img src="KeyConcepts_range_query.png" width="500">
+        <img src="keyConcepts_range_query.png" width="500">
     </a>
 </p>
 
