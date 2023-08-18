@@ -1,5 +1,13 @@
 ---
 sort: 13
+weight: 13
+title: Quick start
+menu:
+  docs:
+    parent: "victoriametrics"
+    weight: 13
+aliases:
+- /Quick-Start.html
 ---
 
 # Quick start
@@ -30,6 +38,8 @@ Just download VictoriaMetrics and follow
 Then read [Prometheus setup](https://docs.victoriametrics.com/Single-server-VictoriaMetrics.html#prometheus-setup)
 and [Grafana setup](https://docs.victoriametrics.com/Single-server-VictoriaMetrics.html#grafana-setup) docs.
 
+VictoriaMetrics is developed at a fast pace, so it is recommended periodically checking the [CHANGELOG](https://docs.victoriametrics.com/CHANGELOG.html) and performing [regular upgrades](https://docs.victoriametrics.com/#how-to-upgrade-victoriametrics).
+
 
 ### Starting VM-Single via Docker
 
@@ -40,7 +50,7 @@ under the current directory:
 
 <div class="with-copy" markdown="1">
 
-```bash
+```console
 docker pull victoriametrics/victoria-metrics:latest
 docker run -it --rm -v `pwd`/victoria-metrics-data:/victoria-metrics-data -p 8428:8428 victoriametrics/victoria-metrics:latest
 ```
@@ -56,20 +66,21 @@ There is also [VictoriaMetrics cluster](https://docs.victoriametrics.com/Cluster
 ### Starting VM-Cluster via Docker
 
 The following commands clone the latest available
-[VictoriaMetrics cluster repository](https://github.com/VictoriaMetrics/VictoriaMetrics/tree/cluster)
-and start the docker container via 'docker-compose'. Further customization is possible by editing
-the [docker-compose.yaml](https://github.com/VictoriaMetrics/VictoriaMetrics/blob/cluster/deployment/docker/docker-compose.yml)
+[VictoriaMetrics repository](https://github.com/VictoriaMetrics/VictoriaMetrics)
+and start the docker container via 'make docker-cluster-up'. Further customization is possible by editing
+the [docker-compose-cluster.yml](https://github.com/VictoriaMetrics/VictoriaMetrics/blob/master/deployment/docker/docker-compose-cluster.yml)
 file.
 
 <div class="with-copy" markdown="1">
 
-```bash
-git clone https://github.com/VictoriaMetrics/VictoriaMetrics --branch cluster && 
-cd VictoriaMetrics/deployment/docker && 
-docker-compose up
+```console
+git clone https://github.com/VictoriaMetrics/VictoriaMetrics && cd VictoriaMetrics
+make docker-cluster-up
 ```
 
 </div>
+
+See more details [here](https://github.com/VictoriaMetrics/VictoriaMetrics/tree/master/deployment/docker#readme).
 
 * [Cluster setup](https://docs.victoriametrics.com/Cluster-VictoriaMetrics.html#cluster-setup)
 
@@ -93,7 +104,7 @@ The same API is also used by
 [VMUI](https://docs.victoriametrics.com/Single-server-VictoriaMetrics.html#vmui) - graphical User Interface
 for querying and visualizing metrics.
 
-[MetricsQL](https://docs.victoriametrics.com/MetricsQL.html) - is he query language for executing read queries
+[MetricsQL](https://docs.victoriametrics.com/MetricsQL.html) - is the query language for executing read queries
 in VictoriaMetrics. MetricsQL is a [PromQL](https://prometheus.io/docs/prometheus/latest/querying/basics) 
 -like query language with a powerful set of functions and features for working specifically with time series data.
 
@@ -134,19 +145,19 @@ VictoriaMetric team prepared a list of [Grafana dashboards](https://grafana.com/
 for the main components. Each dashboard contains a lot of useful information and tips. It is recommended
 to have these dashboards installed and up to date.
 
-The list of alerts for [single](https://github.com/VictoriaMetrics/VictoriaMetrics/blob/master/deployment/docker/alerts.yml)
-and [cluster](https://github.com/VictoriaMetrics/VictoriaMetrics/blob/cluster/deployment/docker/alerts.yml)
+Using the [recommended alerting rules](https://github.com/VictoriaMetrics/VictoriaMetrics/tree/master/deployment/docker#alerts)
 versions would also help to identify and notify about issues with the system.
 
-The rule of the thumb is to have a separate installation of VictoriaMetrics or any other monitoring system
+The rule of thumb is to have a separate installation of VictoriaMetrics or any other monitoring system
 to monitor the production installation of VictoriaMetrics. This would make monitoring independent and
 will help identify problems with the main monitoring installation.
 
+See more details in the article [VictoriaMetrics Monitoring](https://victoriametrics.com/blog/victoriametrics-monitoring/).
 
 ### Capacity planning
 
 See capacity planning sections in [docs](https://docs.victoriametrics.com) for
-[Single-server-VictoriaMetrics](https://docs.victoriametrics.com/Single-server-VictoriaMetrics.html#capacity-planning).
+[Single-server-VictoriaMetrics](https://docs.victoriametrics.com/Single-server-VictoriaMetrics.html#capacity-planning)
 and [VictoriaMetrics Cluster](https://docs.victoriametrics.com/Cluster-VictoriaMetrics.html#capacity-planning).
 
 Capacity planning isn't possible without [monitoring](#monitoring), so consider configuring it first.
@@ -170,3 +181,8 @@ and [backups](https://docs.victoriametrics.com/Single-server-VictoriaMetrics.htm
 To avoid excessive resource usage or performance degradation limits must be in place:
 * [Resource usage limits](https://docs.victoriametrics.com/FAQ.html#how-to-set-a-memory-limit-for-victoriametrics-components);
 * [Cardinality limiter](https://docs.victoriametrics.com/Single-server-VictoriaMetrics.html#cardinality-limiter).
+
+### Security recommendations
+
+* [Security recommendations for single-node VictoriaMetrics](https://docs.victoriametrics.com/#security)
+* [Security recommendations for cluster version of VictoriaMetrics](https://docs.victoriametrics.com/Cluster-VictoriaMetrics.html#security)
